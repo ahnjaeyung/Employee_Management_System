@@ -91,7 +91,8 @@ const mainMenu = () => {
                 viewDepartments();
                 break;
             case 'View all roles':
-                console.log('View all roles');
+                console.log('Displaying all roles:');
+                viewRoles();
                 break;
             case 'View all employees':
                 console.log('View all employees');
@@ -117,6 +118,16 @@ const mainMenu = () => {
 
 const viewDepartments = () => {
     db.query(`SELECT * FROM department`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+    })
+}
+
+const viewRoles = () => {
+    db.query(`SELECT * FROM role`, (err, result) => {
         if (err) {
             console.log(err);
         }

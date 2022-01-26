@@ -5,6 +5,7 @@ const consoleTable = require('console.table');
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
+    password: 'rootroot',
     database: 'company_db'
 });
 
@@ -82,8 +83,35 @@ const updateEmpRole = [
     }
 ]
 
-function init () {
-    console.log('Employee Management System');
+const init = () => {
+    inquirer.prompt(mainMenu).then((answer) => {
+        switch (answer.menuOption) {
+            case 'View all departments':
+                console.log('View all departments');
+                break;
+            case 'View all roles':
+                console.log('View all roles');
+                break;
+            case 'View all employees':
+                console.log('View all employees');
+                break;
+            case 'Add a department':
+                console.log('Add a department');
+                break;
+            case 'Add a role':
+                console.log('Add a role');
+                break;
+            case 'Add an employee':
+                console.log('Add an employee');
+                break;
+            case 'Update an employee role':
+                console.log('Update an employee role');
+                break;
+            case 'Quit':
+                console.log('Quit');
+                break;
+        }
+    })
 }
 
 

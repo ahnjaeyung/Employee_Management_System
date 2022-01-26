@@ -9,7 +9,7 @@ const db = mysql.createConnection({
     database: 'company_db'
 });
 
-const mainMenu = [
+const mainMenuPrompt = [
     {
         type: 'list',
         message: 'Please select one of the following options.',
@@ -83,11 +83,12 @@ const updateEmpRole = [
     }
 ]
 
-const init = () => {
-    inquirer.prompt(mainMenu).then((answer) => {
+const mainMenu = () => {
+    inquirer.prompt(mainMenuPrompt).then((answer) => {
         switch (answer.menuOption) {
             case 'View all departments':
-                console.log('View all departments');
+                console.log('Displaying all departments:');
+                viewDepartments();
                 break;
             case 'View all roles':
                 console.log('View all roles');
@@ -114,6 +115,14 @@ const init = () => {
     })
 }
 
+const viewDepartments = () => {
+    db.query(`SELECT * FROM department`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+    })
+}
 
-
-init();
+mainMenu();

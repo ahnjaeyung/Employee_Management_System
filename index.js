@@ -58,13 +58,13 @@ const addEmpPrompt = [
     {
         type: 'list',
         message: 'Please select the role of the employee.',
-        choices: ['role1', 'role2', 'role3'],
+        choices: ['roleChoices'],
         name: 'EmpRole'
     },
     {
         type: 'list',
         message: 'Please select the manager that the employee reports to.',
-        choices: ['mngr1', 'mngr2', 'mngr3'],
+        choices: ['managerChoices'],
         name: 'empMngr'
     }
 ]
@@ -96,6 +96,7 @@ const mainMenu = () => {
                 break;
             case 'View all employees':
                 console.log('View all employees');
+                viewEmployees();
                 break;
             case 'Add a department':
                 console.log('Add a department');
@@ -127,7 +128,17 @@ const viewDepartments = () => {
 }
 
 const viewRoles = () => {
-    db.query(`SELECT * FROM role`, (err, result) => {
+    db.query(`SELECT role.title AS Position, role.id, department.name AS Department, role.salary FROM role JOIN department ON department.id = role.department_id;`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+    })
+}
+
+const viewEmployees = () => {
+    db.query(`SELECT employee.id, employee.first_name AS First, employee.last_name AS Last, role.title AS Position, role.salary AS Salary, department.name AS Department, CONCAT(m.first_name, ' ', m.last_name) AS Manager From employee INNER JOIN role on role.id = employee.role_id INNER JOIN department ON department.id = role.department_id LEFT JOIN employee m ON employee.manager_id = m.id;`, (err, result) => {
         if (err) {
             console.log(err);
         }

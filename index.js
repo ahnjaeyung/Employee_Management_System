@@ -100,6 +100,7 @@ const mainMenu = () => {
                 break;
             case 'Add a department':
                 console.log('Add a department');
+                addDepartment();
                 break;
             case 'Add a role':
                 console.log('Add a role');
@@ -145,6 +146,18 @@ const viewEmployees = () => {
         console.table(result);
         mainMenu();
     })
+}
+
+const addDepartment = () => {
+    inquirer.prompt(addDeptPrompt).then((answer) => {
+        db.query(`INSERT INTO department(name) VALUES(?);`, answer.deptName, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            mainMenu();
+        })
+    }
+    )
 }
 
 mainMenu();

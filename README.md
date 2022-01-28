@@ -45,7 +45,7 @@ This application is launched through the command line ("node index.js").  Once l
 When the user selects the *View all departments* option, then they are presented with a formatted table displaying department names and department ids.  
 
 When the user selects the *View all roles* option, then they are presented with a formatted table displaying:
-* Position
+* Role name (position)
 * Role ids
 * Departments
 * Salary 
@@ -59,9 +59,26 @@ When the user selects the *View all employees* option, then they are presented w
 * Department
 * Manager
 
-Once the user has entered this information about the intern, they are presented with the main menu once again and may proceed to add another engineer, intern, or finish building their team.  
+When the user selects the *Add a department* option, then they are prompted to enter the name of the department and that department is added to the database.
 
-If the user selects the *Finish building my team* option, an *index.html* file is generated in the dist folder.  The user can then open that file in their default web browser to view their team profile page.
+When the user selects the *Add a role* option, then they are prompted to enter the following information about the new role:
+* Role name
+* Salary
+* Department  
+
+The new role is then added to the database.  
+
+When the user selects the *Add an employee* option, then they are prompted to enter the following information about the new employee:
+* First name
+* Last name
+* Role
+* Manager  
+
+The new employee is then added to the database.  
+
+When the user selects the *Update an employee role* option, then they are prompted to select an employee to update and their new role, and this information is updated in the database.
+
+When the user selects the *Quit* option, then the application is ended.  
 
 ## Credits  
 Jae Ahn
@@ -69,9 +86,9 @@ Jae Ahn
 Read about MIT License:  
 [MIT License](https://opensource.org/licenses/MIT)  
 ## How to Contribute  
-Do not contribute.  
+Contact me if you would like to contribute. 
 ## Tests  
-Test with Jest
+Contact me if you would like to test.
 ## Questions
 For any questions, reach me at: [ahnjaeyung](https://github.com/ahnjaeyung),  
 or email me at: ahn.jaeyung@gmail.com.

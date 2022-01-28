@@ -18,57 +18,57 @@ const mainMenuPrompt = [
     }
 ]
 
-// const addDeptPrompt = [
-//     {
-//         type: 'input',
-//         message: 'Please enter the name of the department.',
-//         name: 'deptName'
-//     }
-// ]
+const addDeptPrompt = [
+    {
+        type: 'input',
+        message: 'Please enter the name of the department.',
+        name: 'deptName'
+    }
+]
 
-// const addRolePrompt = [
+// // const addRolePrompt = [
+// //     {
+// //         type: 'input',
+// //         message: 'Please enter the name of the role.',
+// //         name: 'roleName'
+// //     },
+// //     {
+// //         type: 'input',
+// //         message: 'Please enter the salary for the role.',
+// //         name: 'roleSalary'
+// //     },
+// //     {
+// //         type: 'list',
+// //         message: 'Please enter the department of the role',
+// //         choices: ['dept 1', 'dept2', 'dept3'],
+// //         name: 'roleDept'
+// //     }
+// // ]
+
+// const addEmpPrompt = [
 //     {
 //         type: 'input',
-//         message: 'Please enter the name of the role.',
-//         name: 'roleName'
+//         message: 'Please enter the first name of the employee.',
+//         name: 'EmpFirstName'
 //     },
 //     {
 //         type: 'input',
-//         message: 'Please enter the salary for the role.',
-//         name: 'roleSalary'
+//         message: 'Please enter the last name of the employee.',
+//         name: 'EmpLastName'
 //     },
 //     {
 //         type: 'list',
-//         message: 'Please enter the department of the role',
-//         choices: ['dept 1', 'dept2', 'dept3'],
-//         name: 'roleDept'
+//         message: 'Please select the role of the employee.',
+//         choices: ['roleChoices'],
+//         name: 'EmpRole'
+//     },
+//     {
+//         type: 'list',
+//         message: 'Please select the manager that the employee reports to.',
+//         choices: ['managerChoices'],
+//         name: 'empMngr'
 //     }
 // ]
-
-const addEmpPrompt = [
-    {
-        type: 'input',
-        message: 'Please enter the first name of the employee.',
-        name: 'EmpFirstName'
-    },
-    {
-        type: 'input',
-        message: 'Please enter the last name of the employee.',
-        name: 'EmpLastName'
-    },
-    {
-        type: 'list',
-        message: 'Please select the role of the employee.',
-        choices: ['roleChoices'],
-        name: 'EmpRole'
-    },
-    {
-        type: 'list',
-        message: 'Please select the manager that the employee reports to.',
-        choices: ['managerChoices'],
-        name: 'empMngr'
-    }
-]
 
 const updateEmpRole = [
     {
@@ -109,6 +109,7 @@ const mainMenu = () => {
                 break;
             case 'Add an employee':
                 console.log('Add an employee');
+                addEmployee();
                 break;
             case 'Update an employee role':
                 console.log('Update an employee role');
@@ -164,11 +165,11 @@ const addDepartment = () => {
 }
 
 const addRole = () => {
-    db.query(`SELECT * FROM department`, (err, result) => {
+    db.query(`SELECT * FROM department`, (err, departmentResult) => {
         if (err) {
             console.log(err);
         }
-        result = result.map((department) => {
+        departmentResult = departmentResult.map((department) => {
             return {
                 name: department.name,
                 value: department.id
@@ -188,7 +189,7 @@ const addRole = () => {
             {
                 type: 'list',
                 message: 'Please enter the department of the role',
-                choices: result,
+                choices: departmentResult,
                 name: 'roleDept'
             }
         ]).then((answer) => {
@@ -206,6 +207,70 @@ const addRole = () => {
                 mainMenu();
             }
             )
+        })
+    })
+}
+
+const addEmployee = () => {
+    db.query(`SELECT * FROM role`, (err, roleResult) => {
+        if (err) {
+            console.log(err);
+        }
+        roleResult = roleResult.map((roles) => {
+            return {
+                name: roles.title,
+                value: roles.id
+            };
+        });
+        db.query(`SELECT first_name, last_name, manager_id FROM employee`, (err, managerResult) => {
+            if (err) {
+                console.log(err);
+            }
+            managerResult = managerResult.map((managers) => {
+                return {
+                    name: managers.first_name + " " + managers.last_name,
+                    value: managers.manager_id
+                };
+            });
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    message: 'Please enter the first name of the employee.',
+                    name: 'empFirstName'
+                },
+                {
+                    type: 'input',
+                    message: 'Please enter the last name of the employee.',
+                    name: 'empLastName'
+                },
+                {
+                    type: 'list',
+                    message: 'Please select the role of the employee.',
+                    choices: roleResult,
+                    name: 'empRole'
+                },
+                {
+                    type: 'list',
+                    message: 'Please select the manager that the employee reports to.',
+                    choices: managerResult,
+                    name: 'empMngr'
+                }
+            ]).then((answer) => {
+                db.query(`INSERT INTO employee SET ?`, 
+                {
+                    first_name: answer.empFirstName,
+                    last_name: answer.empLastName,
+                    role_id: answer.empRole,
+                    manager_id: answer.empMngr
+                },
+                (err, result) => {
+                    if(err) {
+                        console.log(err);
+                    }
+                    console.log('New employee successfully added!')
+                    mainMenu();
+                })
+            })
         })
     })
 }

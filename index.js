@@ -18,31 +18,32 @@ const mainMenuPrompt = [
     }
 ]
 
-const addDeptPrompt = [
-    {
-        type: 'input',
-        message: 'Please enter the name of the department.',
-        name: 'deptName'
-    }
-]
+// const addDeptPrompt = [
+//     {
+//         type: 'input',
+//         message: 'Please enter the name of the department.',
+//         name: 'deptName'
+//     }
+// ]
 
-const addRolePrompt = [
-    {
-        type: 'input',
-        message: 'Please enter the name of the role.',
-        name: 'roleName'
-    },
-    {
-        type: 'input',
-        message: 'Please enter the salary for the role.',
-        name: 'roleSalary'
-    },
-    {
-        type: 'input',
-        message: 'Please enter the department of the role',
-        name: 'roleDept'
-    }
-]
+// const addRolePrompt = [
+//     {
+//         type: 'input',
+//         message: 'Please enter the name of the role.',
+//         name: 'roleName'
+//     },
+//     {
+//         type: 'input',
+//         message: 'Please enter the salary for the role.',
+//         name: 'roleSalary'
+//     },
+//     {
+//         type: 'list',
+//         message: 'Please enter the department of the role',
+//         choices: ['dept 1', 'dept2', 'dept3'],
+//         name: 'roleDept'
+//     }
+// ]
 
 const addEmpPrompt = [
     {
@@ -104,6 +105,7 @@ const mainMenu = () => {
                 break;
             case 'Add a role':
                 console.log('Add a role');
+                addRole();
                 break;
             case 'Add an employee':
                 console.log('Add an employee');
@@ -154,10 +156,58 @@ const addDepartment = () => {
             if (err) {
                 console.log(err);
             }
+            console.log("New department successfully added!");
             mainMenu();
         })
     }
     )
+}
+
+const addRole = () => {
+    db.query(`SELECT * FROM department`, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        result = result.map((department) => {
+            return {
+                name: department.name,
+                value: department.id
+            };
+        });
+        inquirer.prompt([
+            {
+                type: 'input',
+                message: 'Please enter the name of the role.',
+                name: 'roleName'
+            },
+            {
+                type: 'input',
+                message: 'Please enter the salary for the role.',
+                name: 'roleSalary'
+            },
+            {
+                type: 'list',
+                message: 'Please enter the department of the role',
+                choices: result,
+                name: 'roleDept'
+            }
+        ]).then((answer) => {
+            db.query(`INSERT INTO role SET ?`,
+            {
+                title: answer.roleName,
+                salary: answer.roleSalary,
+                department_id: answer.roleDept
+            },
+            (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                console.log("New role successfully added!");
+                mainMenu();
+            }
+            )
+        })
+    })
 }
 
 mainMenu();

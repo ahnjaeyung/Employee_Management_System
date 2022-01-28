@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const consoleTable = require('console.table');
+const figlet = require('figlet');
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -25,65 +26,6 @@ const addDeptPrompt = [
         name: 'deptName'
     }
 ]
-
-// // const addRolePrompt = [
-// //     {
-// //         type: 'input',
-// //         message: 'Please enter the name of the role.',
-// //         name: 'roleName'
-// //     },
-// //     {
-// //         type: 'input',
-// //         message: 'Please enter the salary for the role.',
-// //         name: 'roleSalary'
-// //     },
-// //     {
-// //         type: 'list',
-// //         message: 'Please enter the department of the role',
-// //         choices: ['dept 1', 'dept2', 'dept3'],
-// //         name: 'roleDept'
-// //     }
-// // ]
-
-// const addEmpPrompt = [
-//     {
-//         type: 'input',
-//         message: 'Please enter the first name of the employee.',
-//         name: 'EmpFirstName'
-//     },
-//     {
-//         type: 'input',
-//         message: 'Please enter the last name of the employee.',
-//         name: 'EmpLastName'
-//     },
-//     {
-//         type: 'list',
-//         message: 'Please select the role of the employee.',
-//         choices: ['roleChoices'],
-//         name: 'EmpRole'
-//     },
-//     {
-//         type: 'list',
-//         message: 'Please select the manager that the employee reports to.',
-//         choices: ['managerChoices'],
-//         name: 'empMngr'
-//     }
-// ]
-
-// const updateEmpRole = [
-//     {
-//         type: 'list',
-//         message: 'Please select an employee to update their role.',
-//         choices: ['emp1', 'emp2', 'emp3'],
-//         name: 'empToUpdate'
-//     },
-//     {
-//         type: 'list',
-//         message: 'Please select the new role for the employee',
-//         choices: ['role1', 'role2', 'role3'],
-//         name: 'roleToUpdate'
-//     }
-// ]
 
 const mainMenu = () => {
     inquirer.prompt(mainMenuPrompt).then((answer) => {
@@ -118,6 +60,12 @@ const mainMenu = () => {
                 break;
             case 'Quit':
                 console.log('Exiting Employee Management System.');
+                figlet('Goodbye', (err, result) => {
+                    if (err) {
+                        console.log(err)
+                    }
+                    console.log(result);
+                })
                 db.end();
                 break;
         }
@@ -197,18 +145,18 @@ const addRole = () => {
             }
         ]).then((answer) => {
             db.query(`INSERT INTO role SET ?`,
-            {
-                title: answer.roleName,
-                salary: answer.roleSalary,
-                department_id: answer.roleDept
-            },
-            (err, result) => {
-                if (err) {
-                    console.log(err);
+                {
+                    title: answer.roleName,
+                    salary: answer.roleSalary,
+                    department_id: answer.roleDept
+                },
+                (err, result) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log("New role successfully added!");
+                    mainMenu();
                 }
-                console.log("New role successfully added!");
-                mainMenu();
-            }
             )
         })
     })
@@ -259,20 +207,20 @@ const addEmployee = () => {
                     name: 'empMngr'
                 }
             ]).then((answer) => {
-                db.query(`INSERT INTO employee SET ?`, 
-                {
-                    first_name: answer.empFirstName,
-                    last_name: answer.empLastName,
-                    role_id: answer.empRole,
-                    manager_id: answer.empMngr
-                },
-                (err, result) => {
-                    if(err) {
-                        console.log(err);
-                    }
-                    console.log('New employee successfully added!')
-                    mainMenu();
-                })
+                db.query(`INSERT INTO employee SET ?`,
+                    {
+                        first_name: answer.empFirstName,
+                        last_name: answer.empLastName,
+                        role_id: answer.empRole,
+                        manager_id: answer.empMngr
+                    },
+                    (err, result) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.log('New employee successfully added!')
+                        mainMenu();
+                    })
             })
         })
     })
@@ -290,7 +238,7 @@ const updateEmployeeRole = () => {
             };
         });
         db.query(`SELECT * FROM role`, (err, roleResult) => {
-            if(err) {
+            if (err) {
                 console.log(err);
             }
             roleResult = roleResult.map((role) => {
@@ -312,21 +260,20 @@ const updateEmployeeRole = () => {
                     choices: roleResult,
                     name: 'roleToUpdate'
                 }
-            ]).then ((answers) => {
+            ]).then((answers) => {
                 db.query(`UPDATE employee SET ? WHERE ?`,
-                [{role_id: answers.roleToUpdate}, {id: answers.empToUpdate}], 
-                (err, result) => {
-                    if (err) {
-                        console.log(err);
+                    [{ role_id: answers.roleToUpdate }, { id: answers.empToUpdate }],
+                    (err, result) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.log("Employee role successfully updated!")
+                        mainMenu();
                     }
-                    console.log("Employee role successfully updated!")
-                    mainMenu();
-                }
                 )
             })
         })
     })
 }
-
 
 mainMenu();

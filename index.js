@@ -70,19 +70,20 @@ const addDeptPrompt = [
 //     }
 // ]
 
-const updateEmpRole = [
-    {
-        type: 'list',
-        message: 'Please select an employee to update their role.',
-        choices: ['emp1', 'emp2', 'emp3'],
-        name: 'empToUpdate'
-    },
-    {
-        type: 'list',
-        message: 'Please select the new role for the employee',
-        choices: ['role1', 'role2', 'role3']
-    }
-]
+// const updateEmpRole = [
+//     {
+//         type: 'list',
+//         message: 'Please select an employee to update their role.',
+//         choices: ['emp1', 'emp2', 'emp3'],
+//         name: 'empToUpdate'
+//     },
+//     {
+//         type: 'list',
+//         message: 'Please select the new role for the employee',
+//         choices: ['role1', 'role2', 'role3'],
+//         name: 'roleToUpdate'
+//     }
+// ]
 
 const mainMenu = () => {
     inquirer.prompt(mainMenuPrompt).then((answer) => {
@@ -96,26 +97,28 @@ const mainMenu = () => {
                 viewRoles();
                 break;
             case 'View all employees':
-                console.log('View all employees');
+                console.log('Displaying all employees:');
                 viewEmployees();
                 break;
             case 'Add a department':
-                console.log('Add a department');
+                console.log('Adding a department:');
                 addDepartment();
                 break;
             case 'Add a role':
-                console.log('Add a role');
+                console.log('Adding a role:');
                 addRole();
                 break;
             case 'Add an employee':
-                console.log('Add an employee');
+                console.log('Adding an employee:');
                 addEmployee();
                 break;
             case 'Update an employee role':
-                console.log('Update an employee role');
+                console.log('Updating an employee role:');
+                updateEmployeeRole();
                 break;
             case 'Quit':
-                console.log('Quit');
+                console.log('Exiting Employee Management System.');
+                db.end();
                 break;
         }
     })
@@ -274,5 +277,56 @@ const addEmployee = () => {
         })
     })
 }
+
+const updateEmployeeRole = () => {
+    db.query(`SELECT * FROM employee`, (err, employeeResult) => {
+        if (err) {
+            console.log(err);
+        }
+        employeeResult = employeeResult.map((employee) => {
+            return {
+                name: employee.first_name + " " + employee.last_name,
+                value: employee.id
+            };
+        });
+        db.query(`SELECT * FROM role`, (err, roleResult) => {
+            if(err) {
+                console.log(err);
+            }
+            roleResult = roleResult.map((role) => {
+                return {
+                    name: role.title,
+                    value: role.id
+                };
+            });
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    message: 'Please select an employee to update their role.',
+                    choices: employeeResult,
+                    name: 'empToUpdate'
+                },
+                {
+                    type: 'list',
+                    message: 'Please select the new role for the employee',
+                    choices: roleResult,
+                    name: 'roleToUpdate'
+                }
+            ]).then ((answers) => {
+                db.query(`UPDATE employee SET ? WHERE ?`,
+                [{role_id: answers.roleToUpdate}, {id: answers.empToUpdate}], 
+                (err, result) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log("Employee role successfully updated!")
+                    mainMenu();
+                }
+                )
+            })
+        })
+    })
+}
+
 
 mainMenu();
